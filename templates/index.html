@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Csango Knowledge Assistant</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="side-gallery side-gallery-left" aria-hidden="true">
+        <img src="/static/Adler_-_Ceang%C4%83i_din_S%C4%83cele%2C_jud._Bra%C5%9Fov_%202.jpg" alt="" />
+        <img src="/static/Barcas%C3%A1gi_csango4.jpg" alt="" />
+        <img src="/static/Ceangai_Sabaoani%2C_jud._Roman%201.jpg" alt="" />
+        <img src="/static/Adler_-_Pereche_de_ceang%C4%83i_din_Ghime%C5%9F%2C_jud._Bac%C4%83u7.jpg" alt="" />
+      </aside>
+
+      <section class="chat-panel" aria-label="Chat">
+        <header class="chat-header">
+          <h1>Csango Knowledge Assistant</h1>
+        </header>
+
+        <div class="messages" id="messages">
+          <div class="flag-hero" aria-label="Csango flag">
+            <img src="/static/Flag_of_Csangos.svg" alt="Flag of the Csango ethnic group" />
+          </div>
+          <article class="message assistant intro-message">
+            <div class="avatar assistant-avatar">C</div>
+            <div class="message-content">
+              <p>This is an AI chat focused on the Csango. Responses may take around 20 seconds.</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="composer-wrap">
+          <form class="composer" id="chat-form">
+            <label class="sr-only" for="message-input">Message</label>
+            <textarea
+              id="message-input"
+              name="message"
+              rows="1"
+              placeholder="Ask anything"
+              required
+            ></textarea>
+            <button type="submit" aria-label="Send message">↑</button>
+          </form>
+        </div>
+      </section>
+
+      <aside class="side-gallery side-gallery-right" aria-hidden="true">
+        <img src="/static/Adler_-_Familie_de_ceang%C4%83i_din_S%C4%83cele%2C_jud._Bra%C5%9Fov3.jpg" alt="" />
+        <img src="/static/Gyimesi_cs%C3%A1ng%C3%B3k6.jpg" alt="" />
+        <img src="/static/Gyimes_cs%C3%A1ng%C3%B3_magyar_le%C3%A1ny5.jpg" alt="" />
+        <img src="/static/Csango_and_Sz%C3%A9kely_settlements_in_the_United_Principalities%2C_1861.svg8.png" alt="" />
+      </aside>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

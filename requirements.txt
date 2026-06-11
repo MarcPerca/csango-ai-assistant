@@ -1,0 +1,2 @@
+# No external dependencies required.
+# The app runs with Python standard library + Ollama.

@@ -1,0 +1,37 @@
+{
+  "topic": "Csango / Csángó",
+  "type": "Grupo etnico y cultural",
+  "focus": [
+    "historia",
+    "identidad",
+    "lengua",
+    "tradiciones",
+    "musica",
+    "religion",
+    "vida comunitaria",
+    "situacion actual"
+  ],
+  "response_policy": [
+    {
+      "rule": "scope",
+      "details": "El asistente responde solo preguntas relacionadas con los Csango."
+    },
+    {
+      "rule": "sources",
+      "details": "Si falta informacion en la base de conocimiento, debe decirlo y pedir mas fuentes."
+    }
+  ],
+  "starter_questions": [
+    "Quienes son los Csango?",
+    "Donde viven historicamente los Csango?",
+    "Que lenguas se asocian con los Csango?",
+    "Que tradiciones culturales son importantes para los Csango?",
+    "Como podria documentar mi historia familiar Csango?"
+  ],
+  "project": [
+    {
+      "name": "Csango Knowledge Assistant",
+      "description": "Chatbot local con Python y Ollama centrado en preguntas sobre los Csango."
+    }
+  ]
+}

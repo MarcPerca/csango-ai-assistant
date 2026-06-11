@@ -1,90 +1,108 @@
 # Csango Knowledge Assistant
 
-Chatbot local con Python y Ollama centrado en responder preguntas sobre los Csango. La aplicacion usa un modelo local y una base documental editable para generar respuestas sobre historia, cultura, lengua, identidad y contexto.
+Csango Knowledge Assistant is an AI chatbot focused on the Csango people, their history, identity, language, culture, religion, population, and regional context.
 
-## Que Incluye
+The project runs in the browser and uses a Python backend connected to Ollama. It includes an editable knowledge base, so the assistant can answer using project-specific information instead of relying only on the model's general knowledge.
 
-- Interfaz web de chat.
-- Backend en Python sin dependencias externas.
-- Conexion local con Ollama.
-- Memoria de conversacion durante la sesion.
-- Base de conocimiento editable en `data/profile.json` y `data/notes.md`.
-- Recuperacion simple de fragmentos relevantes antes de generar la respuesta con IA.
+## Features
 
-## Requisitos
+- Chat-style web interface
+- Python backend with no external Python dependencies
+- Local AI model execution with Ollama
+- Editable knowledge base in `data/notes.md` and `data/profile.json`
+- Simple retrieval system that selects relevant text before generating an answer
+- English and Spanish responses depending on the user's question
+- Csango flag and cultural images in the interface
 
-- Python 3.10 o superior.
-- Ollama instalado.
-- Un modelo descargado en Ollama, por ejemplo:
+## Requirements
+
+- Python 3.10 or newer
+- Ollama installed
+- An Ollama model downloaded locally
+
+Recommended model:
 
 ```powershell
 ollama pull llama3.2:3b
 ```
 
-Si el equipo tiene poca RAM, conviene empezar con modelos pequenos como `llama3.2:3b` o `phi3:mini`.
+If your computer has limited RAM, start with a small model such as `llama3.2:3b` or `phi3:mini`.
 
-## Ejecutar
+## How To Run
 
-Primero comprueba que Ollama esta disponible:
+1. Check that Ollama is installed:
 
 ```powershell
 ollama --version
 ```
 
-Despues ejecuta la app:
+2. Download the model:
 
 ```powershell
-cd C:\Users\marcp\Desktop\csango-ai-assistant
+ollama pull llama3.2:3b
+```
+
+3. Start the app:
+
+```powershell
 python server.py
 ```
 
-Abre en el navegador:
+4. Open the app in your browser:
 
 ```text
 http://127.0.0.1:8000
 ```
 
-## Configurar El Modelo
+## Changing The Model
 
-Por defecto usa `llama3.2:3b`. Puedes cambiarlo con una variable de entorno:
+By default, the app uses:
+
+```text
+llama3.2:3b
+```
+
+You can change the model with an environment variable:
 
 ```powershell
 $env:OLLAMA_MODEL="phi3:mini"
 python server.py
 ```
 
-## Personalizar La Base De Conocimiento
+## Knowledge Base
 
-Edita:
+The project uses two editable files:
 
-- `data/profile.json`: datos estructurados sobre el tema.
-- `data/notes.md`: textos, fuentes, notas o documentos sobre los Csango.
+- `data/notes.md`: source notes, texts, and cultural information
+- `data/profile.json`: structured data
 
-La aplicacion selecciona fragmentos relevantes de esos archivos y se los pasa al modelo local para generar respuestas.
+When a user asks a question, the backend searches these files, selects relevant fragments, and sends them to the AI model as context.
 
-## Estructura
+This is a simple RAG-style approach. It does not use embeddings or a vector database, but it still allows the assistant to answer from a custom knowledge base.
+
+## Project Structure
 
 ```text
 csango-ai-assistant/
-├── app/
-│   ├── knowledge.py
-│   └── ollama_client.py
-├── data/
-│   ├── notes.md
-│   └── profile.json
-├── static/
-│   ├── app.js
-│   └── styles.css
-├── templates/
-│   └── index.html
-├── server.py
-└── README.md
+|-- app/
+|   |-- knowledge.py
+|   `-- ollama_client.py
+|-- data/
+|   |-- notes.md
+|   `-- profile.json
+|-- static/
+|   |-- app.js
+|   `-- styles.css
+|-- templates/
+|   `-- index.html
+|-- server.py
+`-- README.md
 ```
 
-## Ideas Para Mejorar
+## Possible Improvements
 
-- Guardar conversaciones en SQLite.
-- Anadir subida de documentos para ampliar la base de conocimiento.
-- Usar embeddings y busqueda vectorial para RAG real.
-- Anadir mas fuentes contrastadas sobre los Csango.
-- Publicar capturas y explicacion en un portfolio.
+- Save conversations with SQLite
+- Add document upload support
+- Add embeddings and vector search for a more advanced RAG system
+- Expand the knowledge base with more verified sources
+- Add deployment instructions for a hosted version

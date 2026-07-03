@@ -1,21 +1,21 @@
 from __future__ import annotations
 
 import json
+import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 import re
 
 from app.knowledge import build_system_prompt
+from app.memory import build_memory_context, clear_memory, maybe_remember_user_fact, save_message
 from app.ollama_client import OllamaUnavailable, ask_ollama
+from app.web_search import build_web_context, should_search_web
 
 
 ROOT = Path(__file__).resolve().parent
-HOST = "127.0.0.1"
-PORT = 8000
-
-conversation_memory: list[dict[str, str]] = []
-
+HOST = os.getenv("HOST", "127.0.0.1")
+PORT = int(os.getenv("PORT", "8000"))
 
 def clean_answer_text(answer: str) -> str:
     replacements = {
@@ -94,7 +94,7 @@ class AssistantHandler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
 
         if path == "/api/reset":
-            conversation_memory.clear()
+            clear_memory()
             self.send_json({"status": "ok"})
             return
 
@@ -104,13 +104,33 @@ class AssistantHandler(BaseHTTPRequestHandler):
 
         payload = self.read_json()
         user_message = str(payload.get("message", "")).strip()
+        requested_web_search = bool(payload.get("web_search")) or should_search_web(user_message)
         if not user_message:
             self.send_json({"answer": "Please write a question to begin.", "using_ollama": False})
             return
 
-        conversation_memory.append({"role": "user", "content": user_message})
+        save_message("user", user_message)
+        maybe_remember_user_fact(user_message)
+
+        web_context = ""
+        sources: list[dict[str, str]] = []
+        if requested_web_search:
+            try:
+                web_context, sources = build_web_context(user_message)
+            except Exception:
+                web_context = ""
+                sources = []
+
+        memory_context = build_memory_context(user_message)
         messages = [
-            {"role": "system", "content": build_system_prompt(user_message)},
+            {
+                "role": "system",
+                "content": build_system_prompt(
+                    user_message,
+                    extra_context=web_context,
+                    memory_context=memory_context,
+                ),
+            },
             {"role": "user", "content": user_message},
         ]
 
@@ -124,8 +144,8 @@ class AssistantHandler(BaseHTTPRequestHandler):
             )
             using_ollama = False
 
-        conversation_memory.append({"role": "assistant", "content": answer})
-        self.send_json({"answer": answer, "using_ollama": using_ollama})
+        save_message("assistant", answer)
+        self.send_json({"answer": answer, "using_ollama": using_ollama, "sources": sources})
 
     def read_json(self) -> dict:
         length = int(self.headers.get("Content-Length", "0"))

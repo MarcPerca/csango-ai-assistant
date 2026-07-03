@@ -10,7 +10,11 @@ The project runs in the browser and uses a Python backend connected to Ollama. I
 - Python backend with no external Python dependencies
 - Local AI model execution with Ollama
 - Editable knowledge base in `data/notes.md` and `data/profile.json`
-- Simple retrieval system that selects relevant text before generating an answer
+- Local retrieval system that selects relevant text before generating an answer
+- SQLite conversation memory in `data/memory.sqlite3`
+- Optional free web search mode from the chat interface
+- Tiny local training script for an educational small model
+- Optional LoRA fine-tuning script using free open-source tools
 - English and Spanish responses depending on the user's question
 - Csango flag and cultural images in the interface
 
@@ -80,6 +84,68 @@ When a user asks a question, the backend searches these files, selects relevant 
 
 This is a simple RAG-style approach. It does not use embeddings or a vector database, but it still allows the assistant to answer from a custom knowledge base.
 
+## Memory
+
+The app saves messages and simple user facts in SQLite:
+
+```text
+data/memory.sqlite3
+```
+
+Use the reset endpoint or the UI flow to clear memory:
+
+```text
+POST /api/reset
+```
+
+## Web Search
+
+The composer includes a `Web` toggle. When enabled, the backend performs a free web search, fetches public pages, extracts relevant text, and sends the excerpts to the model as extra context.
+
+No paid search API key is required. Results depend on public website availability and may fail if a site blocks automated access.
+
+## Training A Tiny Model
+
+This project includes a tiny educational n-gram model trainer. It is not a ChatGPT-quality model, but it demonstrates the full train/save/generate loop for free:
+
+```powershell
+python training/train_tiny_ngram.py
+```
+
+The output is written to:
+
+```text
+training/out/tiny_ngram_model.json
+```
+
+## Fine-Tuning
+
+Create a starter instruction dataset:
+
+```powershell
+python training/build_instruction_dataset.py
+```
+
+Then install optional free dependencies:
+
+```powershell
+python -m pip install torch transformers datasets peft accelerate trl
+```
+
+Run the LoRA script:
+
+```powershell
+python training/finetune_lora.py
+```
+
+This uses open-source tooling and does not require a paid API. You may still need enough local RAM/VRAM or a free notebook runtime.
+
+## Free Deployment
+
+See `DEPLOY_FREE.md`.
+
+The included `Dockerfile` runs the app on port `7860`, which is suitable for free Docker-based demos such as Hugging Face Spaces.
+
 ## Project Structure
 
 ```text
@@ -101,8 +167,7 @@ csango-ai-assistant/
 
 ## Possible Improvements
 
-- Save conversations with SQLite
 - Add document upload support
-- Add embeddings and vector search for a more advanced RAG system
+- Add stronger embeddings and vector search for a more advanced RAG system
 - Expand the knowledge base with more verified sources
-- Add deployment instructions for a hosted version
+- Add automated tests

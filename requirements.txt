@@ -1,2 +1,10 @@
 # No external dependencies required.
 # The app runs with Python standard library + Ollama.
+#
+# Optional free fine-tuning dependencies:
+# torch
+# transformers
+# datasets
+# peft
+# accelerate
+# trl

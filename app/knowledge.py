@@ -214,19 +214,52 @@ def split_notes_into_chunks(notes: str) -> list[str]:
     return [chunk for chunk in chunks if chunk]
 
 
+def tokenize(text: str) -> set[str]:
+    stopwords = {
+        "about",
+        "como",
+        "con",
+        "cual",
+        "cuál",
+        "del",
+        "donde",
+        "dónde",
+        "from",
+        "how",
+        "las",
+        "los",
+        "que",
+        "qué",
+        "son",
+        "the",
+        "una",
+        "what",
+        "where",
+        "who",
+    }
+    cleaned = "".join(char.lower() if char.isalnum() else " " for char in text)
+    return {word for word in cleaned.split() if len(word) > 2 and word not in stopwords}
+
+
 def retrieve_relevant_notes(user_message: str, limit: int = 4) -> str:
     notes = load_notes()
     if not notes:
         return ""
 
     keywords = extract_keywords(user_message)
-    if not keywords:
+    query_tokens = tokenize(user_message)
+    if not keywords and not query_tokens:
         return notes[:3500]
 
     scored_chunks = []
     for chunk in split_notes_into_chunks(notes):
         text = chunk.lower()
-        score = sum(1 for keyword in keywords if keyword in text)
+        chunk_tokens = tokenize(chunk)
+        keyword_score = sum(1 for keyword in keywords if keyword in text)
+        overlap = len(query_tokens & chunk_tokens)
+        union = len(query_tokens | chunk_tokens) or 1
+        vector_score = overlap / union
+        score = keyword_score + vector_score
         if score:
             scored_chunks.append((score, chunk))
 
@@ -238,7 +271,7 @@ def retrieve_relevant_notes(user_message: str, limit: int = 4) -> str:
     return "\n\n---\n\n".join(selected)[:4500]
 
 
-def build_context(user_message: str = "") -> str:
+def build_context(user_message: str = "", extra_context: str = "", memory_context: str = "") -> str:
     profile = load_profile()
     notes = retrieve_relevant_notes(user_message)
     question_guidance = build_question_guidance(user_message)
@@ -250,12 +283,16 @@ def build_context(user_message: str = "") -> str:
         parts.append("Structured knowledge:\n" + json.dumps(profile, ensure_ascii=False, indent=2))
     if notes:
         parts.append("Relevant source excerpts:\n" + notes)
+    if memory_context:
+        parts.append("Conversation memory:\n" + memory_context)
+    if extra_context:
+        parts.append("External web context:\n" + extra_context)
 
     return "\n\n".join(parts).strip()
 
 
-def build_system_prompt(user_message: str = "") -> str:
-    context = build_context(user_message)
+def build_system_prompt(user_message: str = "", extra_context: str = "", memory_context: str = "") -> str:
+    context = build_context(user_message, extra_context=extra_context, memory_context=memory_context)
     response_language = detect_response_language(user_message)
 
     return f"""
